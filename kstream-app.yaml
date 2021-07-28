@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kstream-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kstream-app
+  template:
+    metadata:
+      labels:
+        app: kstream-app
+    spec:
+      containers:
+        - name: kstream-app
+          image: aliaksandrmikhailik/kafka-streams:latest
+          env:
+            - name: ARGS
+              value: "kafka.confluent.svc.cluster.local:9092"

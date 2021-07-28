@@ -1,0 +1,33 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KsqlDB
+metadata:
+  name: ksqldb
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-ksqldb-server-operator:6.1.0.0
+    init: confluentinc/cp-init-container-operator:6.1.0.0
+  dataVolumeCapacity: 10Gi
+  configOverrides:
+    server:
+      - ksql.schema.registry.url=http://schemaregistry.confluent.svc.cluster.local:8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ksqldb-external
+  namespace: confluent
+spec:
+  ports:
+    - name: port-1
+      port: 8088
+      protocol: TCP
+      targetPort: 8088
+  selector:
+    app: ksqldb
+    clusterId: confluent
+    confluent-platform: "true"
+    type: ksqldb
+  sessionAffinity: None
+  type: LoadBalancer

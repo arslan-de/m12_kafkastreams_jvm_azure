@@ -1,0 +1,20 @@
+SET 'auto.offset.reset' = 'earliest';
+SET 'cache.max.bytes.buffering' = '0';
+
+CREATE
+STREAM CATEGORIZED_HOTELS
+WITH (kafka_topic='expedia-ext', value_format='AVRO');
+
+// total amount of hotels (hotel_id) for each categor
+
+CREATE TABLE HOTELS_BY_CATEGORY WITH (PARTITIONS = 1) AS
+SELECT CATEGORY, COUNT(HOTEL_ID) AS HOTELS_COUNT
+FROM CATEGORIZED_HOTELS
+GROUP BY CATEGORY EMIT CHANGES;
+
+// number of distinct hotels (hotel_id) for each category
+
+CREATE TABLE HOTELS_DISTINCT_BY_CATEGORY WITH (PARTITIONS = 1) AS
+SELECT CATEGORY, COUNT_DISTINCT(HOTEL_ID) AS HOTELS_COUNT
+FROM CATEGORIZED_HOTELS
+GROUP BY CATEGORY EMIT CHANGES;
